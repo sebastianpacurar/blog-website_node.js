@@ -1,9 +1,10 @@
 const express = require('express');
-const app = express();
-
+const mongoose = require('mongoose')
+const cors = require('cors');
 const path = require('path');
-
-const blogRoutes = require('./routes/blog');
+require('dotenv').config();
+const blogRoutes = require('./routes/blogRoutes');
+const app = express();
 
 
 /**
@@ -12,11 +13,32 @@ const blogRoutes = require('./routes/blog');
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
-// middleware for external customStyles.css
+
 app.use(express.static(path.join(__dirname, '/public')));
+app.use(express.urlencoded({extended: true}));
 
 
-app.listen(3000, 'localhost', () => console.log('Listening on port 3000'));
+// allow cross-origin resource sharing
+app.use(cors());
+
+
+app.use((req, res, next) => {
+    res.locals.path = req.path;
+    next();
+});
+
+
+/**
+ *  Connect to MongoDB cluster
+ */
+
+// normally the .env file shouldn't be included in the repo but I added it for the sake of an example
+mongoose.connect(
+    'mongodb+srv://blog_admin:blogger_personal_admin@myowncluster.y7orl.mongodb.net/blogWebsiteDB?retryWrites=true&w=majority',
+    {useNewUrlParser: true, useUnifiedTopology: true}
+)
+    .then(() => app.listen(3000, 'localhost', () => console.log('Listening on port 3000\nConnected to DB')))
+    .catch(err => console.log(err));
 
 
 /**
@@ -24,11 +46,11 @@ app.listen(3000, 'localhost', () => console.log('Listening on port 3000'));
  */
 
 //home page set to /all-blogs path
-app.get('/', (req, res) => res.redirect('/all-blogs'));
+app.get('/', (req, res) => res.redirect('/blogs'));
 
 
 // blog middleware
-app.use(blogRoutes);
+app.use('/blogs', blogRoutes);
 
 
 // 404 page

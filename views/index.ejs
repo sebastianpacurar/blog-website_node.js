@@ -8,5 +8,33 @@
 
 <%- include('./partials/navBar.ejs') %>
 
+<div class="container">
+    <% if (allBlogs.length > 0) { %>
+        <div class="page-header">
+            <h1>Blogs list</h1>
+        </div>
+
+        <% allBlogs.forEach(item => { %>
+            <ul class="list-group">
+                <li class="list-group-item">
+                    <div class="row">
+
+                        <div class="col-sm-4">
+                            <%= item.title %>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <%= item.description %>
+                        </div>
+
+                    </div>
+                </li>
+            </ul>
+        <% }) %>
+    <% } else { %>
+        <h1>No blogs found</h1>
+    <% } %>
+</div>
+
 </body>
 </html>
